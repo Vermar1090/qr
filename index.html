@@ -87,6 +87,15 @@
             align-items: center;
             padding: 8px 0;
             border-bottom: 1px solid #ecf0f1;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .producto-item:hover {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding-left: 10px;
+            padding-right: 10px;
         }
         
         .producto-nombre {
@@ -122,12 +131,35 @@
             margin: 10px auto;
             display: block;
             border-radius: 10px;
+            border: 2px solid #ddd;
         }
         
         .qr-info {
             font-size: 12px;
             color: #6c757d;
             margin-top: 10px;
+        }
+        
+        .qr-productos {
+            margin-top: 15px;
+        }
+        
+        .qr-producto-item {
+            display: inline-block;
+            margin: 5px;
+            padding: 5px 10px;
+            background: #e9ecef;
+            border-radius: 15px;
+            font-size: 11px;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .qr-producto-item:hover {
+            background: #007bff;
+            color: white;
+            transform: scale(1.05);
         }
         
         .loading {
@@ -163,6 +195,22 @@
             background: #2980b9;
         }
         
+        .btn-demo {
+            background: #f39c12;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: background 0.3s ease;
+        }
+        
+        .btn-demo:hover {
+            background: #e67e22;
+        }
+        
         .notification {
             position: fixed;
             top: 20px;
@@ -196,8 +244,9 @@
     <h1>🍽️ Códigos QR - Mesas Restaurante</h1>
     
     <div class="status-bar">
-        <span id="connection-status">Conectando...</span>
+        <span id="connection-status">🔄 Cargando...</span>
         <button class="btn-simular" onclick="simularCambio()">🎲 Simular Cambio</button>
+        <button class="btn-demo" onclick="cargarDatosDemo()">📋 Cargar Demo</button>
     </div>
     
     <div id="mesas-container" class="mesas-container">
@@ -211,39 +260,75 @@
         // Configuración
         const API_URL = 'https://3tqwc2qb-3000.use.devtunnels.ms/api/mesas';
         const SOCKET_URL = 'https://3tqwc2qb-3000.use.devtunnels.ms/';
-        const DETALLE_URL = 'detalle_producto.html';
+        const DETALLE_URL = 'detalle_producto.html'; // Asegúrate de que este archivo exista
         
         // Variables globales
         let socket;
         let mesas = {};
         
+        // Datos de ejemplo para demostración
+        const datosDemo = {
+            1: {
+                numero: 1,
+                nombre: "Terraza Principal",
+                productos: [
+                    { id: 1, nombre: "Hamburguesa Clásica", categoria: "Comida", precio: 25000, disponible: true },
+                    { id: 2, nombre: "Coca Cola", categoria: "Bebida", precio: 8000, disponible: true },
+                    { id: 3, nombre: "Papas Fritas", categoria: "Acompañamiento", precio: 12000, disponible: false }
+                ]
+            },
+            2: {
+                numero: 2,
+                nombre: "Salón VIP",
+                productos: [
+                    { id: 4, nombre: "Salmón Grillado", categoria: "Plato Fuerte", precio: 45000, disponible: true },
+                    { id: 5, nombre: "Vino Tinto", categoria: "Bebida", precio: 35000, disponible: true },
+                    { id: 6, nombre: "Tiramisú", categoria: "Postre", precio: 18000, disponible: true }
+                ]
+            },
+            3: {
+                numero: 3,
+                nombre: "Zona Familiar",
+                productos: [
+                    { id: 7, nombre: "Pizza Margherita", categoria: "Comida", precio: 28000, disponible: true },
+                    { id: 8, nombre: "Jugo Natural", categoria: "Bebida", precio: 10000, disponible: true },
+                    { id: 9, nombre: "Helado de Vainilla", categoria: "Postre", precio: 15000, disponible: false }
+                ]
+            }
+        };
+        
         // Inicializar Socket.IO
         function inicializarSocket() {
-            socket = io(SOCKET_URL);
-            
-            socket.on('connect', () => {
-                console.log('Conectado al servidor');
-                actualizarEstadoConexion(true);
-            });
-            
-            socket.on('disconnect', () => {
-                console.log('Desconectado del servidor');
-                actualizarEstadoConexion(false);
-            });
-            
-            socket.on('mesas-iniciales', (mesasData) => {
-                mesas = {};
-                mesasData.forEach(mesa => {
-                    mesas[mesa.numero] = mesa;
+            try {
+                socket = io(SOCKET_URL);
+                
+                socket.on('connect', () => {
+                    console.log('Conectado al servidor');
+                    actualizarEstadoConexion(true);
                 });
-                mostrarMesas();
-            });
-            
-            socket.on('producto-actualizado', (data) => {
-                console.log('Producto actualizado:', data);
-                actualizarProducto(data);
-                mostrarNotificacion(`Mesa ${data.mesa}: ${data.producto.nombre} ${data.producto.disponible ? 'disponible' : 'no disponible'}`);
-            });
+                
+                socket.on('disconnect', () => {
+                    console.log('Desconectado del servidor');
+                    actualizarEstadoConexion(false);
+                });
+                
+                socket.on('mesas-iniciales', (mesasData) => {
+                    mesas = {};
+                    mesasData.forEach(mesa => {
+                        mesas[mesa.numero] = mesa;
+                    });
+                    mostrarMesas();
+                });
+                
+                socket.on('producto-actualizado', (data) => {
+                    console.log('Producto actualizado:', data);
+                    actualizarProducto(data);
+                    mostrarNotificacion(`Mesa ${data.mesa}: ${data.producto.nombre} ${data.producto.disponible ? 'disponible' : 'no disponible'}`);
+                });
+            } catch (error) {
+                console.log('Error conectando socket, usando datos demo:', error);
+                actualizarEstadoConexion(false);
+            }
         }
         
         // Actualizar estado de conexión
@@ -252,7 +337,7 @@
             if (conectado) {
                 statusElement.innerHTML = '<span class="status-online">🟢 Conectado - Actualizaciones en tiempo real</span>';
             } else {
-                statusElement.innerHTML = '<span class="status-offline">🔴 Desconectado</span>';
+                statusElement.innerHTML = '<span class="status-offline">🔴 Desconectado - Usando datos de ejemplo</span>';
             }
         }
         
@@ -289,34 +374,16 @@
         
         // Generar QR
         function generarQR(texto) {
-            return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(texto)}`;
+            return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(texto)}`;
         }
         
-        // Cargar mesas iniciales
-        async function cargarMesas() {
-            try {
-                const response = await fetch(API_URL);
-                const resultado = await response.json();
-                
-                if (resultado.success) {
-                    mesas = {};
-                    resultado.data.forEach(mesa => {
-                        mesas[mesa.numero] = mesa;
-                    });
-                    mostrarMesas();
-                }
-            } catch (error) {
-                console.error('Error cargando mesas:', error);
-            }
-        }
-        
-        // Mostrar mesas
+        // Función corregida para mostrar mesas
         function mostrarMesas() {
             const container = document.getElementById('mesas-container');
             const mesasArray = Object.values(mesas);
             
             if (mesasArray.length === 0) {
-                container.innerHTML = '<div class="error">No se encontraron mesas</div>';
+                container.innerHTML = '<div class="error">No se encontraron mesas. <button class="btn-demo" onclick="cargarDatosDemo()">Cargar Demo</button></div>';
                 return;
             }
             
@@ -326,7 +393,7 @@
                     const statusIcon = producto.disponible ? '✅' : '❌';
                     
                     return `
-                        <div class="producto-item ${disponibilidadClass}">
+                        <div class="producto-item ${disponibilidadClass}" onclick="abrirDetalle(${mesa.numero}, ${producto.id})">
                             <div>
                                 <div class="producto-nombre">${statusIcon} ${producto.nombre}</div>
                                 <div style="font-size: 12px; color: #666;">${producto.categoria}</div>
@@ -336,9 +403,19 @@
                     `;
                 }).join('');
                 
-                // Generar QR para cada mesa (apunta a una página de mesa completa)
-                const urlMesa = `${window.location.origin}/qr/mesa_detalle.html?mesa=${mesa.numero}`;
+                // Generar QR para la mesa completa
+                const urlMesa = `${window.location.origin}/${DETALLE_URL}?mesa=${mesa.numero}&view=mesa`;
                 const qrUrl = generarQR(urlMesa);
+                
+                // Generar mini QRs para productos individuales
+                const productosQR = mesa.productos.map(producto => {
+                    const urlProducto = `${window.location.origin}/${DETALLE_URL}?mesa=${mesa.numero}&id=${producto.id}`;
+                    return `
+                        <div class="qr-producto-item" onclick="abrirDetalle(${mesa.numero}, ${producto.id})" title="Ver ${producto.nombre}">
+                            ${producto.nombre}
+                        </div>
+                    `;
+                }).join('');
                 
                 return `
                     <div class="mesa-card" data-mesa="${mesa.numero}">
@@ -352,14 +429,63 @@
                         </div>
                         
                         <div class="qr-container">
-                            <img src="${qrUrl}" alt="QR Mesa ${mesa.numero}" class="qr-code">
+                            <img src="${qrUrl}" alt="QR Mesa ${mesa.numero}" class="qr-code" onclick="mostrarURLMesa(${mesa.numero})">
                             <div class="qr-info">
-                                Escanea para ver el menú completo de esta mesa
+                                Escanea para ver el menú de esta mesa
+                            </div>
+                            <div class="qr-productos">
+                                ${productosQR}
                             </div>
                         </div>
                     </div>
                 `;
             }).join('');
+        }
+        
+        // Abrir detalle de producto
+        function abrirDetalle(mesa, productoId) {
+            const url = `${DETALLE_URL}?mesa=${mesa}&id=${productoId}`;
+            window.open(url, '_blank');
+            mostrarNotificacion(`Abriendo detalle: Mesa ${mesa}, Producto ${productoId}`);
+        }
+        
+        // Mostrar URL de mesa
+        function mostrarURLMesa(mesa) {
+            const url = `${window.location.origin}/${DETALLE_URL}?mesa=${mesa}&view=mesa`;
+            mostrarNotificacion(`URL de Mesa ${mesa}: ${url}`);
+            console.log(`URL Mesa ${mesa}:`, url);
+        }
+        
+        // Cargar mesas desde API
+        async function cargarMesas() {
+            try {
+                const response = await fetch(API_URL);
+                const resultado = await response.json();
+                
+                if (resultado.success) {
+                    mesas = {};
+                    resultado.data.forEach(mesa => {
+                        mesas[mesa.numero] = mesa;
+                    });
+                    mostrarMesas();
+                    actualizarEstadoConexion(true);
+                } else {
+                    throw new Error('Error en la respuesta de la API');
+                }
+            } catch (error) {
+                console.error('Error cargando mesas:', error);
+                actualizarEstadoConexion(false);
+                // Cargar datos demo si falla la API
+                cargarDatosDemo();
+            }
+        }
+        
+        // Cargar datos de demostración
+        function cargarDatosDemo() {
+            mesas = datosDemo;
+            mostrarMesas();
+            mostrarNotificacion('Datos de demostración cargados');
+            actualizarEstadoConexion(false);
         }
         
         // Simular cambio
@@ -370,15 +496,49 @@
                 });
                 const resultado = await response.json();
                 console.log('Cambio simulado:', resultado);
+                mostrarNotificacion('Cambio simulado enviado');
             } catch (error) {
                 console.error('Error simulando cambio:', error);
+                // Simular cambio local para demo
+                simularCambioLocal();
+            }
+        }
+        
+        // Simular cambio local para demo
+        function simularCambioLocal() {
+            const mesasDisponibles = Object.keys(mesas);
+            if (mesasDisponibles.length > 0) {
+                const mesaRandom = mesasDisponibles[Math.floor(Math.random() * mesasDisponibles.length)];
+                const mesa = mesas[mesaRandom];
+                
+                if (mesa.productos.length > 0) {
+                    const productoRandom = mesa.productos[Math.floor(Math.random() * mesa.productos.length)];
+                    productoRandom.disponible = !productoRandom.disponible;
+                    
+                    mostrarMesas();
+                    mostrarNotificacion(`Mesa ${mesa.numero}: ${productoRandom.nombre} ${productoRandom.disponible ? 'disponible' : 'no disponible'}`);
+                }
             }
         }
         
         // Inicializar aplicación
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Iniciando aplicación QR Restaurante');
+            console.log('📱 Archivo de detalle:', DETALLE_URL);
+            
+            // Intentar cargar desde API primero
             cargarMesas();
+            
+            // Inicializar socket
             inicializarSocket();
+            
+            // Si no hay mesas después de 3 segundos, cargar demo
+            setTimeout(() => {
+                if (Object.keys(mesas).length === 0) {
+                    console.log('⚠️ No se cargaron mesas, usando datos demo');
+                    cargarDatosDemo();
+                }
+            }, 3000);
         });
     </script>
 </body>
