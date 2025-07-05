@@ -3,165 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú de Mesa - Restaurante</title>
+    <title>Detalle del Producto - Restaurante</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-        }
-        
-        .mesa-header {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .mesa-numero {
-            font-size: 36px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-        
-        .mesa-nombre {
-            font-size: 20px;
-            color: #7f8c8d;
-            margin-bottom: 15px;
-        }
-        
-        .status-conexion {
-            font-size: 14px;
-            padding: 8px 15px;
-            border-radius: 20px;
-            display: inline-block;
-        }
-        
-        .status-online {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .status-offline {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        
-        .productos-container {
-            display: grid;
-            gap: 15px;
-        }
-        
-        .producto-card {
-            background: white;
-            border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px 25px;
+            text-align: center;
             position: relative;
         }
-        
-        .producto-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.5;
         }
-        
-        .producto-disponible {
-            opacity: 1;
-            border-left: 4px solid #2ecc71;
-        }
-        
-        .producto-no-disponible {
-            opacity: 0.6;
-            border-left: 4px solid #e74c3c;
-            background: #f8f9fa;
-        }
-        
-        .producto-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 10px;
-        }
-        
-        .producto-nombre {
-            font-size: 20px;
-            font-weight: bold;
-            color: #2c3e50;
+
+        .header h1 {
+            font-size: 24px;
             margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
         }
-        
-        .producto-precio {
-            font-size: 18px;
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .loading-state .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.7;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 60px 20px;
             color: #e74c3c;
-            font-weight: bold;
         }
-        
+
+        .error-state .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+
+        .producto-detalle {
+            padding: 30px;
+        }
+
+        .producto-imagen {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .producto-info {
+            margin-bottom: 25px;
+        }
+
+        .producto-nombre {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
         .producto-categoria {
             background: #3498db;
             color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
+            padding: 6px 15px;
+            border-radius: 20px;
             font-size: 12px;
-            margin-bottom: 10px;
+            font-weight: 600;
             display: inline-block;
-        }
-        
-        .producto-descripcion {
-            color: #555;
-            line-height: 1.5;
             margin-bottom: 15px;
         }
-        
-        .producto-status {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 20px;
+
+        .producto-descripcion {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
         }
-        
-        .loading {
-            text-align: center;
-            color: white;
-            font-size: 18px;
-            margin-top: 50px;
-        }
-        
-        .error {
-            text-align: center;
+
+        .producto-precio {
+            font-size: 32px;
+            font-weight: 700;
             color: #e74c3c;
-            font-size: 18px;
-            margin-top: 50px;
-            background: white;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .disponibilidad {
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .disponible {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .no-disponible {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .mesa-info {
+            background: #f8f9fa;
             padding: 20px;
             border-radius: 10px;
+            margin-bottom: 20px;
         }
-        
-        .btn-volver {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 2px solid white;
-            padding: 12px 24px;
-            border-radius: 25px;
+
+        .mesa-info h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .mesa-info p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .acciones {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 16px;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 20px;
             transition: all 0.3s ease;
+            font-size: 14px;
         }
-        
+
+        .btn-volver {
+            background: #95a5a6;
+            color: white;
+        }
+
         .btn-volver:hover {
-            background: white;
-            color: #667eea;
+            background: #7f8c8d;
+            transform: translateY(-2px);
         }
-        
+
+        .btn-agregar {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-agregar:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+
+        .btn-agregar:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .notification {
             position: fixed;
             top: 20px;
@@ -170,215 +233,366 @@
             color: white;
             padding: 15px 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 2000;
             transform: translateX(400px);
             transition: transform 0.3s ease;
         }
-        
+
         .notification.show {
             transform: translateX(0);
         }
-        
-        .actualizado {
-            animation: pulse 2s;
+
+        .notification.error {
+            background: #e74c3c;
         }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+
+        .breadcrumb {
+            background: rgba(255,255,255,0.1);
+            padding: 15px 25px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            cursor: pointer;
+        }
+
+        .breadcrumb a:hover {
+            opacity: 1;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            body {
+                padding: 0;
+            }
+            
+            .acciones {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="mesa-header">
-        <div class="mesa-numero" id="mesa-numero">Mesa</div>
-        <div class="mesa-nombre" id="mesa-nombre">Cargando...</div>
-        <div class="status-conexion" id="status-conexion">Conectando...</div>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ Restaurante Elegante</h1>
+            <p>Detalle del Producto</p>
+        </div>
+
+        <div class="breadcrumb">
+            <a onclick="volver()">← Volver</a>
+            <span style="opacity: 0.6;"> / </span>
+            <span id="breadcrumb-info">Cargando...</span>
+        </div>
+
+        <div id="contenido">
+            <div class="loading-state">
+                <div class="icon">⏳</div>
+                <h3>Cargando producto</h3>
+                <p>Obteniendo información del servidor...</p>
+            </div>
+        </div>
     </div>
-    
-    <div id="productos-container" class="productos-container">
-        <div class="loading">Cargando menú de la mesa...</div>
-    </div>
-    
-    <div style="text-align: center; margin-top: 30px;">
-        <a href="javascript:history.back()" class="btn-volver">← Volver</a>
-    </div>
-    
+
     <div id="notification" class="notification"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script>
-        // Configuración
+        // Configuración de la API
         const API_URL = 'https://3tqwc2qb-3000.use.devtunnels.ms/api/mesas';
-        const SOCKET_URL = 'https://3tqwc2qb-3000.use.devtunnels.ms/';
         
         // Variables globales
-        let socket;
+        let productoActual = null;
         let mesaActual = null;
-        let numeroMesa = null;
-        
-        // Obtener parámetros de URL
-        function obtenerParametroURL(nombre) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(nombre);
-        }
-        
-        // Inicializar Socket.IO
-        function inicializarSocket() {
-            socket = io(SOCKET_URL);
-            
-            socket.on('connect', () => {
-                console.log('Conectado al servidor');
-                actualizarEstadoConexion(true);
-            });
-            
-            socket.on('disconnect', () => {
-                console.log('Desconectado del servidor');
-                actualizarEstadoConexion(false);
-            });
-            
-            socket.on('producto-actualizado', (data) => {
-                console.log('Producto actualizado:', data);
-                if (data.mesa == numeroMesa) {
-                    actualizarProducto(data);
-                    mostrarNotificacion(`${data.producto.nombre} ${data.producto.disponible ? 'disponible' : 'no disponible'}`);
+
+        // Datos de ejemplo para pruebas
+        const datosEjemplo = {
+            mesas: {
+                1: {
+                    numero: 1,
+                    nombre: "Terraza Principal",
+                    productos: [
+                        { id: 1, nombre: "Hamburguesa Clásica", categoria: "Comida", precio: 25000, disponible: true, descripcion: "Deliciosa hamburguesa con carne de res, lechuga, tomate y queso." },
+                        { id: 2, nombre: "Coca Cola", categoria: "Bebida", precio: 8000, disponible: true, descripcion: "Refrescante bebida gaseosa." },
+                        { id: 3, nombre: "Papas Fritas", categoria: "Acompañamiento", precio: 12000, disponible: false, descripcion: "Crujientes papas fritas doradas." }
+                    ]
+                },
+                2: {
+                    numero: 2,
+                    nombre: "Salón VIP",
+                    productos: [
+                        { id: 4, nombre: "Salmón Grillado", categoria: "Plato Fuerte", precio: 45000, disponible: true, descripcion: "Salmón fresco a la parrilla con vegetales." },
+                        { id: 5, nombre: "Vino Tinto", categoria: "Bebida", precio: 35000, disponible: true, descripcion: "Vino tinto de la casa." },
+                        { id: 6, nombre: "Tiramisú", categoria: "Postre", precio: 18000, disponible: true, descripcion: "Clásico postre italiano." }
+                    ]
+                },
+                3: {
+                    numero: 3,
+                    nombre: "Zona Familiar",
+                    productos: [
+                        { id: 7, nombre: "Pizza Margherita", categoria: "Comida", precio: 28000, disponible: true, descripcion: "Pizza tradicional con tomate, mozzarella y albahaca." },
+                        { id: 8, nombre: "Jugo Natural", categoria: "Bebida", precio: 10000, disponible: true, descripcion: "Jugo natural de frutas de temporada." },
+                        { id: 9, nombre: "Helado de Vainilla", categoria: "Postre", precio: 15000, disponible: false, descripcion: "Cremoso helado artesanal de vainilla." }
+                    ]
                 }
-            });
-        }
-        
-        // Actualizar estado de conexión
-        function actualizarEstadoConexion(conectado) {
-            const statusElement = document.getElementById('status-conexion');
-            if (conectado) {
-                statusElement.innerHTML = '🟢 Conectado';
-                statusElement.className = 'status-conexion status-online';
-            } else {
-                statusElement.innerHTML = '🔴 Desconectado';
-                statusElement.className = 'status-conexion status-offline';
             }
+        };
+
+        // Inicializar aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                cargarProductoDesdeURL();
+            }, 500); // Pequeño delay para mostrar la carga
+        });
+
+        // Obtener parámetros de la URL
+        function obtenerParametrosURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return {
+                mesa: urlParams.get('mesa'),
+                producto: urlParams.get('producto'),
+                id: urlParams.get('id')
+            };
         }
-        
-        // Actualizar producto específico
-        function actualizarProducto(data) {
-            if (mesaActual) {
-                const producto = mesaActual.productos.find(p => p.id === data.producto.id);
-                if (producto) {
-                    producto.disponible = data.producto.disponible;
-                    mostrarMesa(mesaActual);
+
+        // Cargar producto desde URL
+        async function cargarProductoDesdeURL() {
+            const params = obtenerParametrosURL();
+            
+            console.log('Parámetros URL:', params);
+            
+            if (!params.mesa || !params.id) {
+                mostrarError('Parámetros incompletos en la URL', 'Se requieren mesa e id del producto');
+                return;
+            }
+
+            try {
+                mostrarNotificacion('Cargando producto...', 'success');
+                
+                // Intentar cargar desde API
+                let productoEncontrado = null;
+                
+                try {
+                    const response = await fetch(`${API_URL}/${params.mesa}/productos/${params.id}`);
                     
-                    // Animar el producto actualizado
-                    const productoElement = document.querySelector(`[data-producto="${data.producto.id}"]`);
-                    if (productoElement) {
-                        productoElement.classList.add('actualizado');
-                        setTimeout(() => {
-                            productoElement.classList.remove('actualizado');
-                        }, 2000);
+                    if (response.ok) {
+                        const resultado = await response.json();
+                        
+                        if (resultado.success) {
+                            productoEncontrado = resultado.data;
+                        }
+                    }
+                } catch (errorAPI) {
+                    console.log('Error en API, usando datos de ejemplo:', errorAPI);
+                }
+                
+                // Si no se pudo cargar de la API, usar datos de ejemplo
+                if (!productoEncontrado) {
+                    const mesaEjemplo = datosEjemplo.mesas[params.mesa];
+                    if (mesaEjemplo) {
+                        const producto = mesaEjemplo.productos.find(p => p.id == params.id);
+                        if (producto) {
+                            productoEncontrado = {
+                                ...producto,
+                                mesa: mesaEjemplo
+                            };
+                        }
                     }
                 }
+                
+                if (productoEncontrado) {
+                    productoActual = productoEncontrado;
+                    mesaActual = productoEncontrado.mesa;
+                    mostrarProducto(productoEncontrado);
+                    actualizarBreadcrumb();
+                    mostrarNotificacion('Producto cargado correctamente', 'success');
+                } else {
+                    throw new Error('Producto no encontrado');
+                }
+                
+            } catch (error) {
+                console.error('Error al cargar producto:', error);
+                mostrarError('Error al cargar el producto', error.message);
             }
         }
-        
+
+        // Mostrar producto en la interfaz
+        function mostrarProducto(data) {
+            const producto = data;
+            const mesa = data.mesa;
+            
+            // Obtener icono basado en categoría
+            const iconoCategoria = obtenerIconoCategoria(producto.categoria);
+            
+            // Determinar disponibilidad
+            const disponibilidadClass = producto.disponible ? 'disponible' : 'no-disponible';
+            const disponibilidadTexto = producto.disponible ? '✅ Disponible' : '❌ No disponible';
+            
+            const html = `
+                <div class="producto-detalle">
+                    <div class="producto-imagen">
+                        ${iconoCategoria}
+                    </div>
+                    
+                    <div class="producto-info">
+                        <h2 class="producto-nombre">${producto.nombre}</h2>
+                        <span class="producto-categoria">${producto.categoria}</span>
+                        
+                        <div class="producto-descripcion">
+                            ${producto.descripcion || 'Sin descripción disponible'}
+                        </div>
+                        
+                        <div class="producto-precio">
+                            $${producto.precio.toLocaleString('es-CO')}
+                        </div>
+                        
+                        <div class="disponibilidad ${disponibilidadClass}">
+                            ${disponibilidadTexto}
+                        </div>
+                    </div>
+                    
+                    <div class="mesa-info">
+                        <h3>📍 Información de la Mesa</h3>
+                        <p><strong>Número:</strong> Mesa ${mesa.numero}</p>
+                        <p><strong>Ubicación:</strong> ${mesa.nombre}</p>
+                        <p><strong>Producto ID:</strong> #${producto.id}</p>
+                    </div>
+                    
+                    <div class="acciones">
+                        <button class="btn btn-volver" onclick="volver()">
+                            ← Volver
+                        </button>
+                        <button class="btn btn-agregar" onclick="agregarAlCarrito()" ${!producto.disponible ? 'disabled' : ''}>
+                            ${producto.disponible ? '+ Agregar al Carrito' : 'No Disponible'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('contenido').innerHTML = html;
+        }
+
+        // Mostrar error
+        function mostrarError(titulo, mensaje) {
+            const html = `
+                <div class="error-state">
+                    <div class="icon">❌</div>
+                    <h3>${titulo}</h3>
+                    <p>${mensaje}</p>
+                    <div style="margin-top: 30px;">
+                        <button class="btn btn-volver" onclick="volver()">
+                            ← Volver
+                        </button>
+                        <button class="btn btn-agregar" onclick="cargarEjemplo()" style="background: #3498db; margin-left: 10px;">
+                            📋 Ver Ejemplo
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('contenido').innerHTML = html;
+        }
+
+        // Cargar ejemplo para demostración
+        function cargarEjemplo() {
+            const ejemploProducto = {
+                id: 1,
+                nombre: "Hamburguesa Clásica",
+                categoria: "Comida",
+                precio: 25000,
+                disponible: true,
+                descripcion: "Deliciosa hamburguesa con carne de res, lechuga, tomate y queso cheddar. Acompañada de papas fritas.",
+                mesa: {
+                    numero: 1,
+                    nombre: "Terraza Principal"
+                }
+            };
+            
+            productoActual = ejemploProducto;
+            mesaActual = ejemploProducto.mesa;
+            mostrarProducto(ejemploProducto);
+            actualizarBreadcrumb();
+            mostrarNotificacion('Ejemplo cargado correctamente', 'success');
+        }
+
+        // Obtener icono según categoría
+        function obtenerIconoCategoria(categoria) {
+            const iconos = {
+                'Comida': '🍽️',
+                'Bebida': '🥤',
+                'Postre': '🍰',
+                'Acompañamiento': '🍟',
+                'Entrada': '🥗',
+                'Plato Fuerte': '🥘',
+                'Sopa': '🍲',
+                'Ensalada': '🥗'
+            };
+            return iconos[categoria] || '🍽️';
+        }
+
+        // Actualizar breadcrumb
+        function actualizarBreadcrumb() {
+            if (productoActual && mesaActual) {
+                document.getElementById('breadcrumb-info').textContent = 
+                    `Mesa ${mesaActual.numero} / ${productoActual.nombre}`;
+            }
+        }
+
+        // Agregar al carrito (simulado)
+        function agregarAlCarrito() {
+            if (!productoActual || !productoActual.disponible) {
+                mostrarNotificacion('El producto no está disponible', 'error');
+                return;
+            }
+            
+            // Simular agregado al carrito
+            mostrarNotificacion(`${productoActual.nombre} agregado al carrito`, 'success');
+            
+            // Opcional: redirigir después de un tiempo
+            setTimeout(() => {
+                console.log('Producto agregado al carrito:', productoActual);
+            }, 1500);
+        }
+
+        // Volver a la página anterior
+        function volver() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                // Si no hay historial, mostrar mensaje
+                mostrarNotificacion('Use el botón atrás del navegador para volver', 'success');
+            }
+        }
+
         // Mostrar notificación
-        function mostrarNotificacion(mensaje) {
+        function mostrarNotificacion(mensaje, tipo = 'success') {
             const notification = document.getElementById('notification');
             notification.textContent = mensaje;
+            notification.className = `notification ${tipo}`;
             notification.classList.add('show');
-            
+
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
         }
+
+        // Ejemplos de URLs para testing (mostrar en consola)
+        console.log('Página de detalle cargada. Ejemplos de URLs:');
+        console.log('- ?mesa=1&id=1 (Hamburguesa)');
+        console.log('- ?mesa=2&id=4 (Salmón)');
+        console.log('- ?mesa=3&id=7 (Pizza)');
+        console.log('- ?mesa=1&id=3 (Papas - No disponible)');
         
-        // Cargar mesa específica
-        async function cargarMesa() {
-            const container = document.getElementById('productos-container');
-            numeroMesa = obtenerParametroURL('mesa');
-            
-            if (!numeroMesa) {
-                container.innerHTML = `
-                    <div class="error">
-                        <h2>Error</h2>
-                        <p>No se especificó el número de mesa en la URL</p>
-                        <p>La URL debe ser algo como: mesa_detalle.html?mesa=1</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${API_URL}/${numeroMesa}`);
-                
-                if (!response.ok) {
-                    if (response.status === 404) {
-                        throw new Error('Mesa no encontrada');
-                    }
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
-                
-                const resultado = await response.json();
-                
-                if (resultado.success) {
-                    mesaActual = resultado.data;
-                    mostrarMesa(mesaActual);
-                } else {
-                    throw new Error(resultado.message || 'Error al cargar la mesa');
-                }
-                
-            } catch (error) {
-                console.error('Error:', error);
-                container.innerHTML = `
-                    <div class="error">
-                        <h2>Error al cargar la mesa</h2>
-                        <p>${error.message}</p>
-                        <p><small>Asegúrate de que la API esté corriendo en http://localhost:3000</small></p>
-                    </div>
-                `;
-            }
-        }
-        
-        // Mostrar mesa
-        function mostrarMesa(mesa) {
-            const container = document.getElementById('productos-container');
-            const numeroElement = document.getElementById('mesa-numero');
-            const nombreElement = document.getElementById('mesa-nombre');
-            
-            // Actualizar header
-            numeroElement.textContent = `Mesa ${mesa.numero}`;
-            nombreElement.textContent = mesa.nombre;
-            document.title = `Mesa ${mesa.numero} - ${mesa.nombre}`;
-            
-            // Mostrar productos
-            container.innerHTML = mesa.productos.map(producto => {
-                const disponibilidadClass = producto.disponible ? 'producto-disponible' : 'producto-no-disponible';
-                const statusIcon = producto.disponible ? '✅' : '❌';
-                const statusText = producto.disponible ? 'Disponible' : 'No disponible';
-                
-                return `
-                    <div class="producto-card ${disponibilidadClass}" data-producto="${producto.id}">
-                        <div class="producto-status">${statusIcon}</div>
-                        <div class="producto-header">
-                            <div>
-                                <div class="producto-nombre">${producto.nombre}</div>
-                                <div class="producto-categoria">${producto.categoria}</div>
-                            </div>
-                            <div class="producto-precio">${producto.precio.toLocaleString('es-CO')}</div>
-                        </div>
-                        <div class="producto-descripcion">${producto.descripcion}</div>
-                        <div style="font-size: 14px; color: ${producto.disponible ? '#2ecc71' : '#e74c3c'}; font-weight: bold;">
-                            ${statusText}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        // Inicializar aplicación
-        document.addEventListener('DOMContentLoaded', () => {
-            cargarMesa();
-            inicializarSocket();
-        });
+        // Mostrar URL actual
+        console.log('URL actual:', window.location.href);
     </script>
 </body>
 </html>
